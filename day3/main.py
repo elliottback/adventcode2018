@@ -1,5 +1,4 @@
 import re
-from collections import Counter
 
 class Claim:
     def __init__(self, line):

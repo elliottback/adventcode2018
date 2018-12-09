@@ -17,5 +17,4 @@ def parseMeta(arr):
 
     return sum;
 
-
 print( parseMeta( numbers ) )
