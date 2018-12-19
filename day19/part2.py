@@ -1,4 +1,4 @@
-# :\Users\ellio\Downloads\pypy3-v6.0.0-win32>pypy3.exe part2.py
+# C:\Users\ellio\Downloads\pypy3-v6.0.0-win32>pypy3.exe part2.py
 # arg this takes forever to run, I switched to pypy3
 # it still takes forever....
 
