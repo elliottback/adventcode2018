@@ -1,4 +1,6 @@
 import copy
+import sys
+from termcolor import colored
 
 f = open( "input", "r").read().split("\n")
 
@@ -6,7 +8,6 @@ f = open( "input", "r").read().split("\n")
 tracks = list( map( lambda line: list(line), f ) )
 
 def next_direction( current, idx ):
-
     if idx == 1:
         return current
     elif idx == 0 and current == "^":
@@ -48,10 +49,11 @@ def printTracks():
     temp = copy.deepcopy( tracks )
 
     for (x, y, v, _) in carts:
-        temp[x][y] = v
+        temp[x][y] = colored(v, 'red')
 
     for y in range(0, len(temp)):
         print("".join(temp[y]))
+    print("\n")
 
 def checkCollisions():
     global carts
@@ -70,72 +72,59 @@ def checkCollisions():
 # iterate until we crash!!!!
 printTracks()
 while True:
-    # 3: check and remove collisions
-    collisions = checkCollisions()
-    for k, cartslist in collisions.items():
-        if len(cartslist) > 1:
-            for cart in cartslist:
-                if cart in carts:
-                    carts.remove(cart)
+    # sort carts
+    carts.sort( key = lambda i: ( i[0], i[1] ) )
 
-    if len(carts) == 1:
-        printTracks()
+    if len(carts) <= 1:
         print( carts[0][1], ",", carts[0][0] )
         break
+
+    carts_that_we_nuke = list()
 
     for index, (x, y, velocity, _) in enumerate(carts):
         # 1: make ur move
         # going up
         if velocity == '^':
+            carts[index][0] -= 1
             if tracks[x-1][y] == '/':
                 carts[index][2] = '>'
-                carts[index][0] -= 1
             elif tracks[x-1][y] == '\\':
                 carts[index][2] = '<'
-                carts[index][0] -= 1
-            elif tracks[x-1][y] == '|' or tracks[x-1][y] == '+':
-                carts[index][0] -= 1
-            else:
-                raise ValueError("going up with an issue boss!")
         # going down
         elif velocity == 'v':
+            carts[index][0] += 1
             if tracks[x+1][y] == '/':
                 carts[index][2] = '<'
-                carts[index][0] += 1
             elif tracks[x+1][y] == '\\':
                 carts[index][2] = '>'
-                carts[index][0] += 1
-            elif tracks[x+1][y] == '|' or tracks[x+1][y] == '+':
-                carts[index][0] += 1
-            else:
-                raise ValueError("going down with an issue boss!")
         # going right
         elif velocity == '>':
+            carts[index][1] += 1
             if tracks[x][y+1] == '/':
                 carts[index][2] = '^'
-                carts[index][1] += 1
             elif tracks[x][y+1] == '\\':
                 carts[index][2] = 'v'
-                carts[index][1] += 1
-            elif tracks[x][y+1] == '-' or tracks[x][y+1] == '+':
-                carts[index][1] += 1
-            else:
-                raise ValueError("going down with an issue boss!")
         # going left
         elif velocity == '<':
+            carts[index][1] -= 1
             if tracks[x][y-1] == '/':
                 carts[index][2] = 'v'
-                carts[index][1] -= 1
             elif tracks[x][y-1] == '\\':
                 carts[index][2] = '^'
-                carts[index][1] -= 1
-            elif tracks[x][y-1] == '-' or tracks[x][y-1] == '+':
-                carts[index][1] -= 1
-            else:
-                raise ValueError("going down with an issue boss!")
-
         # 2: if you landed on an intersection, change direction
         (x,y) = ( carts[index][0],  carts[index][1] )
         if tracks[x][y] == '+':
             carts[index][2] = next_direction( carts[index][2], carts[index][3] )
             carts[index][3] = ( carts[index][3] + 1 ) % 3
+
+        # 3: check and remove collisions
+        collisions = checkCollisions()
+        for k, cartslist in collisions.items():
+            if len(cartslist) > 1:
+                print("collision: ", k)
+                for cart in cartslist:
+                    carts_that_we_nuke.append(cart)
+
+    for cart in carts_that_we_nuke:
+        if cart in carts:
+            carts.remove(cart)
