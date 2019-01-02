@@ -128,9 +128,11 @@ def step( state, ip_register, program ):
     (op, in1, in2, out) = program[state[ip_register]]
     opMap[op](state, in1, in2, out)
 
-while ip >= 0 and ip < len(program):
+i = 0
+while i < 10000:
     state[ip_register] = ip
     step(state, ip_register, program)
     ip = state[ip_register] + 1
+    i += 1
 
-print(state)
+print( "https://www.wolframalpha.com/input/?i=sum+of+factors+of+" + str(state[1] ) )
